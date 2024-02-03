@@ -8,7 +8,7 @@ import axios from "axios";
 import { UserContextProvider } from "./context/userContext";
 
 axios.defaults.baseURL = "http://localhost:4000/";
-axios.defaults.withCredentials = true;
+// axios.defaults.withCredentials = true;
 
 function App() {
   return (

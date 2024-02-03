@@ -17,15 +17,9 @@ export const bcryptSalt = bcrypt.genSaltSync(10)
 
 app.use(express.json())
 app.use(cookieParser())
-// app.use(cors());
+app.use(cors());
+// app.use(cors({ credentials: true, origin: "http://localhost:5173/" }))
 
-app.use(cors({ credentials: true, origin: "http://localhost:5173/" }))
-app.use((req, res, next) => {
-    res.header('Access-Control-Allow-Origin', 'http://your-client.com');
-    res.header('Access-Control-Allow-Credentials', true);
-    // Additional headers as needed
-    next();
-});
 
 
 app.use("/", userRouter)

@@ -31,28 +31,13 @@ const signIn = async (req, res, next) => {
     const matched = bcrypt.compareSync(password, foundedUser.password)
     if (!matched) return next(new AppError("Wrong Password", 401))
     const token = jwt.sign({ id: foundedUser?._id, name: foundedUser?.name }, "secretKey")
-    res.cookie("token", token).json({ foundedUser, message: "success", token })
-}
-
-const profile = (req, res, next) => {
-    // const { token } = req.cookie.token
-    // if (token) {
-    //     jwt.verify(token, "secretKey", {}, (err, user) => {
-    //         if (err) throw err;
-    //         res.json(user)
-    //     })
-    // } else {
-    //     res.json("not working")
-    // }
-    res.json("hello")
-
+    res.cookie("token", token).json({ message: "success", token })
 }
 
 export {
     getAllUsers,
     signIn,
     signUp,
-    profile
 }
 
 

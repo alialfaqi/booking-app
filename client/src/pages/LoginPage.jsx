@@ -2,24 +2,30 @@ import axios from "axios";
 import React, { useContext, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { UserContext } from "../context/userContext";
+import { useCookies } from "react-cookie";
 
 const LoginPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [errorMessage, setErrorMessage] = useState("");
   const { setUser } = useContext(UserContext);
+  const [cookies, setCookie, removeCookie] = useCookies(["UserToken"]);
 
   const navigate = useNavigate();
+
+  const expirationDate = new Date();
+  expirationDate.setDate(expirationDate.getDate() + 7);
 
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
       const { data } = await axios.post("/login", { email, password });
-      setUser(data.foundedUser);
+      setCookie("UserToken", data.token, { expires: expirationDate });
+      window.localStorage.setItem("logged", true);
       navigate("/");
       console.log(data);
+      console.log(expirationDate);
     } catch (error) {
-      console.log(error.response);
+      console.log(error.response.data.message);
     }
   };
 
