@@ -23,7 +23,6 @@ const LoginPage = () => {
       window.localStorage.setItem("logged", true);
       navigate("/");
       console.log(data);
-      console.log(expirationDate);
     } catch (error) {
       console.log(error.response.data.message);
     }

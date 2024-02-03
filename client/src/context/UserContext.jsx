@@ -11,7 +11,9 @@ export function UserContextProvider({ children }) {
   useEffect(() => {
     if (localStorage.getItem("logged")) {
       const token = cookies.UserToken;
-      console.log(token);
+      const decodedToken = jwtDecode(token)
+      console.log(decodedToken);
+      setUser(decodedToken)
     }
   }, []);
 
