@@ -6,6 +6,14 @@ import { userModel } from "./models/user.model.js";
 import bcrypt from "bcryptjs"
 import userRouter from "./routes/user.router.js"
 import cookieParser from "cookie-parser";
+import download from "image-downloader"
+
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
 
 dotenv.config();
 
@@ -23,6 +31,16 @@ app.use(cors());
 
 
 app.use("/", userRouter)
+
+app.post('/upload-by-link', async (req, res, next) => {
+    const { link } = req.body
+    const newName = Date.now() + ".jpg"
+    await download.image({
+        url: link,
+        dest: __dirname + "/uploads/" + newName
+    })
+    res.send({ fileName: newName })
+})
 
 app.use((err, req, res, next) => {
     const statusCode = err.statusCode || 500;

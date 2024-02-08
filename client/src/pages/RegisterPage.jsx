@@ -1,19 +1,25 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 
 const RegisterPage = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const navigate = useNavigate();
 
   const handleRegister = async (e) => {
     e.preventDefault();
-    const { data } = await axios.post("/register", {
-      name,
-      email,
-      password,
-    });
+    try {
+      const { data } = await axios.post("/register", {
+        name,
+        email,
+        password,
+      });
+      navigate("/login");
+    } catch (error) {
+      console.log(error.response.data);
+    }
   };
   return (
     <>

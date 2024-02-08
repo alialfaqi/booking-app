@@ -17,7 +17,7 @@ const signUp = catchAsyncError(async (req, res, next) => {
     const addedUser = await userModel.create({
         name,
         email,
-        password: bcrypt.hashSync(password, "10")
+        password: bcrypt.hashSync(password, bcryptSalt)
     })
     res.send({ addedUser, message: "success" })
 
@@ -30,7 +30,7 @@ const signIn = async (req, res, next) => {
     if (!foundedUser) return next(new AppError("User not Found", 500))
     const matched = bcrypt.compareSync(password, foundedUser.password)
     if (!matched) return next(new AppError("Wrong Password", 401))
-    const token = jwt.sign({ id: foundedUser?._id, name: foundedUser?.name }, "secretKey")
+    const token = jwt.sign({ id: foundedUser?._id, name: foundedUser?.name, email: foundedUser?.email }, "secretKey")
     res.cookie("token", token).json({ message: "success", token })
 }
 
