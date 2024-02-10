@@ -1,7 +1,8 @@
-import { useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { useContext, useState } from "react";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import Perks from "../components/Perks";
+import { UserContext } from "../context/UserContext";
 
 const PlacesPage = () => {
   const { action } = useParams();
@@ -17,21 +18,8 @@ const PlacesPage = () => {
     checkOut: "",
     maxGuest: 1,
   });
-
-  const inputHeader = (text) => {
-    return <h2 className="text-xl mt-4 ">{text}</h2>;
-  };
-  const inputDescription = (text) => {
-    return <p className="text-gray-500">{text}</p>;
-  };
-  const preInput = (header, description) => {
-    return (
-      <>
-        {inputHeader(header)}
-        {inputDescription(description)}
-      </>
-    );
-  };
+  const { user } = useContext(UserContext);
+  const navigate = useNavigate();
 
   const addPhotoByLink = async (e) => {
     e.preventDefault();
@@ -48,6 +36,33 @@ const PlacesPage = () => {
     }));
   };
 
+  const uploadPhoto = (e) => {
+    const files = e.target.files;
+    const data = new FormData();
+    console.log(user);
+    for (let i = 0; i < files.length; i++) {
+      data.append("photos", files[i]);
+    }
+
+    axios
+      .post("/upload", data, {
+        headers: { "Content-type": "multipart/form-data" },
+      })
+      .then((response) => {
+        setFormData((prev) => ({
+          ...prev,
+          addedPhotos: [...prev.addedPhotos, ...response.data],
+        }));
+      });
+  };
+
+  const addNewPlace = (e) => {
+    e.preventDefault();
+    axios.post("/places", { owner: user.id, ...formData }).then(({ data }) => {
+      console.log(data);
+    });
+    navigate("/account/places");
+  };
   return (
     <>
       <div>
@@ -76,7 +91,7 @@ const PlacesPage = () => {
           </div>
         ) : (
           <div>
-            <form>
+            <form onSubmit={addNewPlace}>
               <h2 className="text-xl mt-4 ">Title</h2>
               <p className="text-gray-500">
                 Title for your place. should be catchy and short as in
@@ -109,10 +124,24 @@ const PlacesPage = () => {
                   Add&nbsp;photo
                 </button>
               </div>
-              <div className="mt-2 grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
+
+              <div className="mt-2 gap-2 grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
                 {formData.addedPhotos.length > 0 &&
-                  formData.addedPhotos.map((link) => <div>{link}</div>)}
-                <button className="flex items-center justify-center gap-2 border bg-transparent rounded-2xl p-8 text-2xl text-gray-600">
+                  formData.addedPhotos.map((link, index) => (
+                    <div className="h-32 flex" key={index}>
+                      <img
+                        className="rounded-2xl w-full object-cover"
+                        src={`http://localhost:4000/uploads/${link}`}
+                      />
+                    </div>
+                  ))}
+                <label className="h-32 cursor-pointer flex items-center justify-center gap-2 border bg-transparent rounded-2xl p-8 text-2xl text-gray-600">
+                  <input
+                    type="file"
+                    multiple
+                    className="hidden"
+                    onChange={uploadPhoto}
+                  />
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"
@@ -128,7 +157,7 @@ const PlacesPage = () => {
                     />
                   </svg>
                   Upload
-                </button>
+                </label>
               </div>
               <h2 className="text-2xl mt-4">Description</h2>
               <p className="text-gray-500 text-sm">description of the place</p>
@@ -145,7 +174,7 @@ const PlacesPage = () => {
                 select all the perks of the place
               </p>
               <div className="grid gap-2 grid-cols-2 md:grid-cols-4 lg:grid-cols-6 mt-2">
-                <Perks />
+                <Perks formData={formData} setFormData={setFormData} />
               </div>
               <h2 className="text-2xl mt-4">Extra Info</h2>
               <p className="text-gray-500 text-sm">house, rules, etc...</p>

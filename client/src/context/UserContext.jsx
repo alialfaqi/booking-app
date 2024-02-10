@@ -14,7 +14,6 @@ export function UserContextProvider({ children }) {
     if (localStorage.getItem("logged")) {
       const token = cookies.UserToken;
       const decodedToken = jwtDecode(token);
-      console.log(decodedToken);
       setUser(decodedToken);
     }
   }, [cookies.UserToken]);
